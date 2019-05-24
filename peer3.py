@@ -6,6 +6,9 @@ import os
 
 import socket, json, os.path
 
+HOST = '127.0.0.1' 
+PORT = '4002'
+
 app = Flask(__name__)
 api = Api(app)
 
@@ -20,9 +23,10 @@ class Peer3(Resource):
 
         print("Texto enviado pelo cliente: " + args['text'])
 
-        end = 'Arquivos'
+        end = 'Arq'
         dire = os.listdir(end)
-        dire.insert(0,'127.0.0.1')
+        dire.insert(0,HOST)
+        dire.insert(0,PORT)
         string = str(dire)
         b = "[],''"
         for i in range(0,len(b)):
@@ -31,6 +35,8 @@ class Peer3(Resource):
         return jsonify({
                     "count":  string,
         })
+
+
 
 api.add_resource(Peer3, '/peer3', methods=['GET','POST'])
 

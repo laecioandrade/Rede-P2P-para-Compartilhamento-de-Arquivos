@@ -17,6 +17,7 @@ class Tracker(Resource):
         # texto enviado pelo cliente para contagem
 		args = parser.parse_args()
 		print("Texto enviado pelo cliente: " + args['text'])
+		y = str(args['text'])
 		retorno = requests.post("http://127.0.0.1:4001/peer2", json={"text": "Procurando"})
 		if retorno.json()['count']:
 			x1 = retorno.json()['count']
@@ -37,24 +38,38 @@ class Tracker(Resource):
 
 		for i in y1:
 			if i == args['text']:
-				lista.append('127.0.0.1')
+				lista.append(y1[0])
+				lista.append(y1[1])
 				break;
 		for i in y2:
 			if i == args['text']:
-				lista.append('127.0.0.1')
+				lista.append(y2[0])
+				lista.append(y2[1])
 				break;
 		for i in y3:
 			if i == args['text']:
-				lista.append('127.0.0.1')
+				lista.append(y3[0])
+				lista.append(y3[1])
 				break;
 
 		lista.append(args['text'])
 		print(lista)
 
+		arquivo = open('torrent.txt', 'w')
+		for i in lista:
+			arquivo.write(i+'\n')
+			arquivo.write('\n')
+		arquivo.close()
 
-		return jsonify({
-			"count":  lista,
-		})
+
+		#arquivo = open('torrent.txt', 'w')
+		#arquivo.close()
+
+		#arquivo = open('torrent.txt', 'w')
+		#for i in lista:
+		#	arquivo.write(i+'\n')
+		#arquivo.close()
+
 
 api.add_resource(Tracker, '/Tracker', methods=['GET','POST'])
 
