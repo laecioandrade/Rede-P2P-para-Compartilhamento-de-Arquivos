@@ -98,7 +98,7 @@ while 1:
 	tam3 = int(hash_tam[0])-int(tam1)-int(tam2)
 	#print(tam3)
 	#print(int(tam1)+int(tam2)+int(tam3))
-
+	lista.insert(0,str(qtd))
 	lista.append(str(tam1))
 	lista.append(str(tam2))
 	lista.append(str(tam3))
