@@ -12,16 +12,16 @@ def file_as_bytes(file):
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = "127.0.0.1"
-port = 6004
-print(host)
-print(port)
+port = 6005
+print (host)
+print (port)
 serversocket.bind((host, port))
 
 serversocket.listen(5)
 print('server started and listening')
 
 s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((host,7004))
+s.bind((host,7005))
 s.listen(5)
 while 1:
     (clientsocket, address) = serversocket.accept()
@@ -48,8 +48,9 @@ while 1:
     dire.insert(0,tam)
     dire.insert(0,hash_data)
     dire.insert(0,host)
-    dire.insert(0,7004)
+    dire.insert(0,7005)
 
+    #print(dire)
     string = str(dire)
     b = "[],''"
     for i in range(0,len(b)):

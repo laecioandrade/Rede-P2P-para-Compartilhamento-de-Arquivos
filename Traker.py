@@ -32,19 +32,19 @@ while 1:
 	clientsocket.send(r.encode())
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect(('127.0.0.1',7003))
+	s.connect(('127.0.0.1',6003))
 	dados1=ts(arq)
 	print(dados1)
 	s.close ()
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect(('127.0.0.1',7004))
+	s.connect(('127.0.0.1',6004))
 	dados2 = ts(arq)
 	print(dados2)
 	s.close ()
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect(('127.0.0.1',7005))
+	s.connect(('127.0.0.1',6005))
 	dados3 = ts(arq)
 	print(dados3)
 	s.close ()
@@ -82,29 +82,30 @@ while 1:
 			hash_tam.append(dados3[3])
 			break;
 
-	tamanho = int(hash_tam[0])
-	if (tamanho % 2 == 0):
-		tam1 = int(hash_tam[0])/2
-	else:
-		tam1 = int(tamanho/2)
-	#print(tam1)
-	tam2 = tamanho-tam1
-	if (tam2 % 2 == 0):
-		aux = tam2/2
-		tam2 = int(aux) + int(aux/2)
-	else:
-		tam2 = int(tam2/2)
-	#print(tam2)
-	tam3 = int(hash_tam[0])-int(tam1)-int(tam2)
-	#print(tam3)
-	#print(int(tam1)+int(tam2)+int(tam3))
-	lista.insert(0,str(qtd))
-	lista.append(str(tam1))
-	lista.append(str(tam2))
-	lista.append(str(tam3))
-	lista.append(hash_adc[0])
-	lista.append(arq)
-	print(lista)
+	if qtd!=0:
+		tamanho = int(hash_tam[0])
+		if (tamanho % 2 == 0):
+			tam1 = int(int(hash_tam[0])/2)
+		else:
+			tam1 = int(tamanho/2)
+		#print(tam1)
+		tam2 = tamanho-tam1
+		if (tam2 % 2 == 0):
+			aux = tam2/2
+			tam2 = int(aux) + int(aux/2)
+		else:
+			tam2 = int(tam2/2)
+		#print(tam2)
+		tam3 = int(hash_tam[0])-int(tam1)-int(tam2)
+		#print(tam3)
+		#print(int(tam1)+int(tam2)+int(tam3))
+		lista.insert(0,str(qtd))
+		lista.append(str(tam1))
+		lista.append(str(tam2))
+		lista.append(str(tam3))
+		lista.append(hash_adc[0])
+		lista.append(arq)
+		print(lista)
 
 	arquivo = open('torrent.txt', 'w')
 	for i in lista:
