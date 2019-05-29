@@ -2,11 +2,15 @@ import requests, string, asyncio, time
 from flask import Flask, jsonify
 from flask_restful import reqparse, abort, Api, Resource
 from threading import Thread
-
+import hashlib
 import socket, json, os.path
 
 def ts(str):
 	s.send(str.encode()) 
+
+def file_as_bytes(file):
+	with file:
+		return file.read()
 
 def check_ping(hostname):
     response = os.system("ping -c 1 " + hostname)
@@ -19,7 +23,7 @@ def check_ping(hostname):
     return pingstatus
 
 HOST = "127.0.0.1"
-PORT = 7001
+PORT = 6001
 while True:
 	x = input("\n\n1-Procurar arquivo\n2-Baixar PDF\n3-Sair\n")
 	if x == '1':
@@ -35,7 +39,7 @@ while True:
 		#Recebendo arquivo com os dados
 		s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		print("Escutando a porta...")
-		s.bind((HOST,7002))
+		s.bind((HOST,6002))
 		s.listen(2)
 	 
 		print("Aceitando a conexao...")
@@ -93,6 +97,8 @@ while True:
 		print(".torrent foi um sucesso!")
 
 	elif x == '2':
+		print('Porta de envio')
+		porta_env = '6009'
 		print('Vamos baixar seu aquivo jaja...')
 		
 		'''start = time.time()
@@ -130,7 +136,10 @@ while True:
 
 		pedido.append(nome_arq)
 		pedido.append(tam_blocks[0])
+		pedido.append(porta_env)
+		pedido.append(HOST)
 		pedido.append(tamanho)
+
 		pedido = ' '.join(pedido)
 		#print(str(hosts[0]))
 		#print(int(ports[0]))
@@ -146,7 +155,10 @@ while True:
 
 		pedido.append(nome_arq)
 		pedido.append(tam_blocks[1])
+		pedido.append(porta_env)
+		pedido.append(HOST)
 		pedido.append(tamanho)
+
 		pedido = ' '.join(pedido)
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((str(hosts[1]),int(ports[1])))
@@ -160,7 +172,10 @@ while True:
 
 		pedido.append(nome_arq)
 		pedido.append(tam_blocks[2])
+		pedido.append(porta_env)
+		pedido.append(HOST)
 		pedido.append(tamanho)
+
 		pedido = ' '.join(pedido)
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((str(hosts[2]),int(ports[2])))
@@ -168,13 +183,15 @@ while True:
 		#time.sleep(5) 
 		s.close()
 
-		'''print("recebendo o arquivo...")
-		arq = open('Download/pedido','wb')
-		
+		print("recebendo o arquivo...")
+		saida = open('Download/saida.pdf','wb')
+
+		i=0
+		print(len(hosts))
 		while i < len(hosts):
 			s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			print("Escutando a porta...")
-			s.bind((HOST,PORT))
+			s.bind(('127.0.0.1',int(porta_env)))
 			s.listen(2)
 		 
 			print("Aceitando a conexao...")
@@ -184,12 +201,18 @@ while True:
 				dados=conn.recv(1024)
 				if not dados:
 					break
-				arq.write(dados)    
+				saida.write(dados)    
 			 
 			print("saindo...")
 			conn.close()
 			i+=1
-		arq.close()'''
+		saida.close()
+
+		result  = hashlib.md5(file_as_bytes(open('Download/saida.pdf', 'rb'))).hexdigest()
+		if result == cod_hash:
+			print('Hash bateu, arquivos iguais')
+		else:
+			print('Arquivos diferentes né bichão')
 
 
 	elif x == '3':

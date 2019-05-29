@@ -33,15 +33,15 @@ while 1:
     print ("connection found!")
     data = clientsocket.recv(1024).decode()
     print(data)
-    end = 'Arquivos'
+    end = 'Arquivo_peer2'
     dire = os.listdir(end)
+    tam=0
     for i in dire:
         if i == data:
             hash_data = hashlib.md5(file_as_bytes(open(end+'/'+data, 'rb'))).hexdigest()
             arq=open(end+'/'+data,'rb')
  
             #print("enviado  arquivo")
-            tam=0
             for i in arq:
                 tam+=1
                     #print i
@@ -70,20 +70,31 @@ while 1:
     arq2 = arq2.split()
     print(arq2)
 
-    '''s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+
+    time.sleep(2)
+    sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+     
     print("conectando com servidor...")
-    s.connect((HOST,PORT))
+    sock.connect((arq2[3],int(arq2[2])))
+    print(arq2[0])
     print("abrindo arquivo...")
-    arq=open(end+'/'arq2[0],'rb')
-    print("enviado  arquivo")
-    cont=0
-    tam = int(arq2[1])
-    for i in arq:
-        cont+=1
-        if cont<tam:
+    arq_aux=open(end+'/'+arq2[0],'r+b')
+     
+    print("enviando  arquivo")
+    cont=1
+    z=0
+
+    print("Inicio = ",cont)
+    print("Fim =", int(arq2[1]))
+    for i in arq_aux:
+        if (cont<int(arq2[1])):
             #print i
-            s.send(i)
-    #print(cont)
+            sock.send(i)
+        cont+=1
+        z+=1
+    print(z)
+     
     print("saindo...")
-    arq.close()
-    s.close()'''
+    arq_aux.close()
+    #arq.close()
+    sock.close()

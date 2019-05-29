@@ -15,7 +15,7 @@ def ts(str):
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = '127.0.0.1'
-port = 7001
+port = 6001
 print(host)
 print(port)
 serversocket.bind((host, port))
@@ -115,7 +115,7 @@ while 1:
 	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
  
 	print("conectando com servidor...")
-	s.connect((host,7002))
+	s.connect((host,6002))
 	 
 	print("abrindo arquivo...")
 	arq=open('torrent.txt','rb')
