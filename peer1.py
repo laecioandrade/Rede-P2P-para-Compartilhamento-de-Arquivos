@@ -13,14 +13,15 @@ def file_as_bytes(file):
 		return file.read()
 
 def check_ping(hostname):
-    response = os.system("ping -c 1 " + hostname)
-    # and then check the response...
-    if response == 0:
-        pingstatus = "Network Active"
-    else:
-        pingstatus = "Network Error"
+    os.system("ping -c 1 " + hostname)
 
-    return pingstatus
+def hashFor(data):
+    # Prepare the project id hash
+    hashId = hashlib.md5()
+
+    hashId.update(repr(data).encode('utf-8'))
+
+    return hashId.hexdigest()
 
 HOST = "127.0.0.1"
 PORT = 6001
@@ -34,7 +35,7 @@ while True:
 		ts(y)
 		s.close ()
 
-		print("recebendo o arquivo...")
+		print("Recebendo o arquivo .torrent...")
 		arq = open('torrent/torrent.txt','wb')
 		#Recebendo arquivo com os dados
 		s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -63,34 +64,47 @@ while True:
 		for linha in texto :
 		    res = linha
 		arq.close()
-		#Criando lista de dados
-		res = res.split()
 		print(res)
+		#Criando lista de dados
+		if res != []:
+			res = res.split()
+			print(res)
 
-		#PSeparando dados da lista
-		tam_blocks = []
-		hosts = []
-		ports = []
-		qtd_peers = res[0]
-		fim1 = int(qtd_peers)*2
-		fim2 = fim1 + int(qtd_peers) + 1
-		for i in range(1,fim1,2):
-			ports.append(res[i])
-			hosts.append(res[i+1])
-		for i in range((fim1+1),fim2,1):
-			tam_blocks.append(res[i])
-		cod_hash=res[fim2]
-		nome_arq=res[fim2+1]
-		
-		#Mostrando dados
-		print(cod_hash)
-		print(nome_arq)
-		print(tam_blocks)
-		print(hosts)
-		print(ports)
+			#Preparando dados da lista
+			tam_blocks = []
+			hosts = []
+			ports = []
+			qtd_peers = res[0]
+			fim1 = int(qtd_peers)*2
+			fim2 = fim1 + int(qtd_peers) + 1
+			for i in range(1,fim1,2):
+				ports.append(res[i])
+				hosts.append(res[i+1])
+			for i in range((fim1+1),fim2,1):
+				tam_blocks.append(res[i])
+			cod_hash=res[fim2]
+			nome_arq=res[fim2+1]
+			
+			#Mostrando dados
+			print(cod_hash)
+			print(nome_arq)
+			print(tam_blocks)
+			print(hosts)
+			print(ports)
 
-		tamanho = int(tam_blocks[0])+int(tam_blocks[1])+int(tam_blocks[2])
-		tamanho = str(tamanho)
+			tamanho=0
+			for i in range(len(hosts)):
+				tamanho+=int(tam_blocks[i])
+			tamanho = str(tamanho)
+			
+			print('\n\n')
+			print('Tamanho dos blocos')
+			print(tam_blocks)
+			print('Tamanho')
+			print(tamanho)
+			print('\n\n')
+		else:
+			print('Nenhum peer tem o arquivo!')
 
 
 
@@ -100,121 +114,572 @@ while True:
 		print('Porta de envio')
 		porta_env = '6009'
 		print('Vamos baixar seu aquivo jaja...')
-		
-		'''start = time.time()
-		pingstatus = check_ping('192.168.0.111')
-		tempo = time.time()-start
-		print(tempo)
-		print(pingstatus)'''
-		#Pegando tempo para verificação de distância
-		'''times = []
-		for i in range(len(hosts)):
-			#print(hosts[i])
-			#print(ports[i])
-			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		time1 = 0
+		time2 = 0
+		time3 = 0
+		if qtd_peers == 1:
 			start = time.time()
-			sock.connect_ex((str(hosts[i]), int(ports[i])))
-			times.append((time.time()-start))
-			sock.close()
-		print(times)'''
+			check_ping(hosts[0])
+			time1 = time.time()-start
+			del start
+		if qtd_peers == 2:
+			start = time.time()
+			check_ping(hosts[0])
+			time1 = time.time()-start
 
+			start = time.time()
+			check_ping(hosts[1])
+			time2 = time.time()-start
+			del start
+		if qtd_peers == 3:
+			start = time.time()
+			check_ping(hosts[0])
+			time1 = time.time()-start
 
+			start = time.time()
+			check_ping(hosts[1])
+			time2 = time.time()-start
 
+			start = time.time()
+			check_ping(hosts[2])
+			time3 = time.time()-start
+			del start
+			
+
+		print(time)
+
+		qtd_peers = len(hosts)
 		#Verificar tempos
-		'''if times[0]<=times[1] and times[1]<=times[2]:
-			print("1,2,3")
-		elif times[1]<=times[0] and times[0]<=times[2]:
-			print("2,1,3")
-		elif times[0]<=times[1] and times[1]>=times[2]:
-			print("1,3,2")
-		elif times[0]>=times[1] and times[1]<=times[2]:
-			print("2,1,3")
-		else:
-			print("3,2,1")'''
+		if qtd_peers == 1:
+			pedido = []
 
-		pedido = []
+			pedido.append(nome_arq)
+			pedido.append(tam_blocks[0])
+			pedido.append(porta_env)
+			pedido.append(HOST)
+			pedido.append(tamanho)
+			pedido.append(qtd_peers)
+			pedido.append('0')
 
-		pedido.append(nome_arq)
-		pedido.append(tam_blocks[0])
-		pedido.append(porta_env)
-		pedido.append(HOST)
-		pedido.append(tamanho)
+			pedido = ' '.join(map(str, pedido))
+			#print(str(hosts[0]))
+			#print(int(ports[0]))
+			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			s.connect((str(hosts[0]),int(ports[0])))
+			ts(pedido)
+			#time.sleep(5) 
+			s.close()
 
-		pedido = ' '.join(pedido)
-		#print(str(hosts[0]))
-		#print(int(ports[0]))
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((str(hosts[0]),int(ports[0])))
-		ts(pedido)
-		#time.sleep(5) 
-		s.close()
+			del pedido
+		if qtd_peers == 2:
+			if time1 <= time2:
+				pedido = []
 
-		del pedido
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[0])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('0')
 
-		pedido = []
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[0]),int(ports[0])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
 
-		pedido.append(nome_arq)
-		pedido.append(tam_blocks[1])
-		pedido.append(porta_env)
-		pedido.append(HOST)
-		pedido.append(tamanho)
+				del pedido
 
-		pedido = ' '.join(pedido)
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((str(hosts[1]),int(ports[1])))
-		ts(pedido)
-		#time.sleep(5) 
-		s.close()
+				pedido = []
 
-		del pedido
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[1])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('1')
 
-		pedido = []
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[1]),int(ports[1])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
 
-		pedido.append(nome_arq)
-		pedido.append(tam_blocks[2])
-		pedido.append(porta_env)
-		pedido.append(HOST)
-		pedido.append(tamanho)
+				del pedido
+				print("1,2")
+			else:
+				pedido = []
 
-		pedido = ' '.join(pedido)
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((str(hosts[2]),int(ports[2])))
-		ts(pedido)
-		#time.sleep(5) 
-		s.close()
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[1])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('1')
 
-		print("recebendo o arquivo...")
-		saida = open('Download/saida.pdf','wb')
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[0]),int(ports[0])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[0])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('0')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[1]),int(ports[1])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+				print("2,1")
+		if qtd_peers == 3:
+			if time1<=time2 and time2<=time3:
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[0])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('0')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[0]),int(ports[0])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[1])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('1')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[1]),int(ports[1])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[2])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('2')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[2]),int(ports[2])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+				print("1,2,3")
+			elif time1<=time2 and time3<=time2:
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[0])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('0')
+
+				#pedido = ' '.join(pedido)
+				pedido = ' '.join(map(str, pedido))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[0]),int(ports[0])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[2])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('2')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[1]),int(ports[1])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[1])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('1')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[2]),int(ports[2])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+				print("1,3,2")
+			elif time2<=time1 and time1<=time3:
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[1])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('1')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[0]),int(ports[0])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[0])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('0')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[1]),int(ports[1])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[2])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('2')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[2]),int(ports[2])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+				print("2,1,3")
+			elif time2<=time3 and time3<=time1:
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[2])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('2')
+
+				pedido = ' '.join(map(str, pedido))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[0]),int(ports[0])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[0])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('0')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[1]),int(ports[1])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[1])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('1')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[2]),int(ports[2])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+				print("2,3,1")
+			elif time3<=time1 and time1<=time2:
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[1])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('1')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[0]),int(ports[0])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[2])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('2')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[1]),int(ports[1])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[0])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('0')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[2]),int(ports[2])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+				print("3,1,2")
+			else:
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[2])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('2')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[0]),int(ports[0])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[1])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('1')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[1]),int(ports[1])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+
+				pedido = []
+
+				pedido.append(nome_arq)
+				pedido.append(tam_blocks[0])
+				pedido.append(porta_env)
+				pedido.append(HOST)
+				pedido.append(tamanho)
+				pedido.append(qtd_peers)
+				pedido.append('0')
+
+				pedido = ' '.join(map(str, pedido))
+				#print(str(hosts[0]))
+				#print(int(ports[0]))
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				s.connect((str(hosts[2]),int(ports[2])))
+				ts(pedido)
+				#time.sleep(5) 
+				s.close()
+
+				del pedido
+				print("3,2,1")
+
+		print("Recebendo o arquivo...")
+		saida_a = open('Download/saida.pdf','wb')
 
 		i=0
 		print(len(hosts))
 		while i < len(hosts):
 			s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			print("Escutando a porta...")
+			print("...")
 			s.bind(('127.0.0.1',int(porta_env)))
 			s.listen(2)
 		 
-			print("Aceitando a conexao...")
+			print("...")
 			conn,addr= s.accept()
 			 	 
 			while 1:
 				dados=conn.recv(1024)
 				if not dados:
 					break
-				saida.write(dados)    
+				saida_a.write(dados)    
 			 
-			print("saindo...")
+			print("...")
 			conn.close()
 			i+=1
-		saida.close()
+		saida_a.close()
+		print("Arquivo baixado...")
 
+
+		#aux_arq_hash =  open('Download/saida.pdf','rb')
+		#result  = hashFor(aux_arq_hash)
+		#aux_arq_hash.close()
 		result  = hashlib.md5(file_as_bytes(open('Download/saida.pdf', 'rb'))).hexdigest()
+		print(cod_hash)
+		print(result)
 		if result == cod_hash:
-			print('Hash bateu, arquivos iguais')
+			print('Otimas noticias, o Hash bateu, arquivos iguais')
 		else:
 			print('Arquivos diferentes né bichão')
-
-
+		del result
+		del cod_hash
 	elif x == '3':
 		print("Saindo...")
 		break
