@@ -11,12 +11,10 @@ def file_as_bytes(file):
         return file.read()
 
 def hashFor(data):
-    # Prepare the project id hash
     hashId = hashlib.md5()
-
     hashId.update(repr(data).encode('utf-8'))
-
     return hashId.hexdigest()
+
 #Conexão com Tracker
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = "127.0.0.1"
@@ -33,7 +31,7 @@ s.listen(5)
 
 while 1:
     (clientsocket, address) = serversocket.accept()
-    print ("Conexão ok!")
+    #print ("Conexão ok!")
     data = clientsocket.recv(1024).decode()
     print("O arquivo solicitado é: ",data)
     end = 'Arquivo_peer4'
@@ -76,13 +74,14 @@ while 1:
         clientsocket.send(string.encode())
 
         #Recebendo pedido
-        print("Conexão de pedido ok!")
+        #print("Conexão de pedido ok!")
         conn, addr = s.accept()
         arq2= conn.recv(1024).decode() 
-        print(arq2)
+        #print(arq2)
         arq2 = arq2.split()
         print(arq2)
-    
+        
+        #Verificando quando sua ordem e tamanho do bloco correspondente
         if int(arq2[5]) == 1:
             tam_env = 0
             tam_fim = int(arq2[4])+1
@@ -110,14 +109,14 @@ while 1:
                 tam_fim = int(arq2[4])+1
                 time.sleep(6)
         
-
+        #Criando conexão para envio de parte do arquivo
         sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        print("Conectando com cliente...")
+        #print("Conectando com cliente...")
         sock.connect((arq2[3],int(arq2[2])))
         print(arq2[0])
-        print("abrindo arquivo...")
+        #print("abrindo arquivo...")
         arq_aux=open(end+'/'+arq2[0],'r+b')
-        print("enviando  arquivo")
+        print("\nEnviando arquivo...")
         cont=1
 
         tam_env = int(tam_env)
@@ -129,9 +128,10 @@ while 1:
                 sock.send(i)
                 tam_env+=1
             cont+=1
-        print(tam_env)
-        print(cont)
-        print("Enviado com sucesso!...")
+        #print(tam_env)
+        #print(cont)
+        
+        print("Enviado com sucesso!...\n")
         arq_aux.close()
         sock.close()
     else:

@@ -5,17 +5,15 @@ from threading import Thread
 import hashlib
 
 import socket, json, os.path
-
+#função do hash
 def file_as_bytes(file):
     with file:
         return file.read()
 
+#função do hash que não esta sendo utilizada
 def hashFor(data):
-    # Prepare the project id hash
     hashId = hashlib.md5()
-
     hashId.update(repr(data).encode('utf-8'))
-
     return hashId.hexdigest()
 
 
@@ -37,7 +35,7 @@ s.listen(5)
 while 1:
 
     (clientsocket, address) = serversocket.accept()
-    print ("Conexão ok!")
+    #print ("Conexão ok!")
     data = clientsocket.recv(1024).decode()
     print("O arquivo solicitado é: ",data)
     end = 'Arquivo_peer2'
@@ -62,6 +60,7 @@ while 1:
  
             arq.close()
     
+    #O processo a seguir só ira ocorrer se o peer possuir o arquivo
     if verifica_arquivo==1:
         #Adicionado tamanho total do arquivo
         dire.insert(0,tam)
@@ -80,15 +79,16 @@ while 1:
         clientsocket.send(string.encode())
 
         #Recebendo pedido
-        print("conexão encontrada!")
+        #print("conexão encontrada!")
         conn, addr = s.accept()
         arq2= conn.recv(1024).decode() 
-        print(arq2)
+        #print(arq2)
         arq2 = arq2.split()
         print(arq2)
 
 
         #z=0
+        #Verificando quando sua ordem e tamanho do bloco correspondente
         if int(arq2[5]) == 1:
             tam_env = 1
             tam_fim = int(arq2[4])+1
@@ -116,13 +116,14 @@ while 1:
                 tam_fim = int(arq2[4])+1
                 time.sleep(6)
 
+        #Criando conexão para envio de parte do arquivo
         sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        print("Conectando com cliente...")
+        #print("Conectando com cliente...")
         sock.connect((arq2[3],int(arq2[2])))
-        print(arq2[0])
-        print("abrindo arquivo...")
+        #print(arq2[0])
+        #print("abrindo arquivo...")
         arq_aux=open(end+'/'+arq2[0],'r+b')
-        print("enviando  arquivo")
+        print("\nEnviando arquivo...")
         cont=1
 
         tam_env = int(tam_env)
@@ -135,10 +136,10 @@ while 1:
                 tam_env+=1
             cont+=1
             #z+=1
-        print(tam_env)
-        print(cont)
+        #print(tam_env)
+        #print(cont)
          
-        print("Enviado com sucesso!...")
+        print("Enviado com sucesso!...\n")
         arq_aux.close()
         #arq.close()
         sock.close()

@@ -23,32 +23,38 @@ serversocket.bind((host, port))
 serversocket.listen(5)
 print('Iniciando a escuta!')
 while 1:
+	#Recebendo nome do arquivo
 	(clientsocket, address) = serversocket.accept()
-	print ("Conexão ok!")
+	#print ("Conexão ok!")
 	arq = clientsocket.recv(1024).decode()
-	print(arq)
+	print("Nome do arquivo: ",arq)
 
 	r = 'Tratando dados...'
 	clientsocket.send(r.encode())
 
+	#Recebendo arquivos disponivei no peer2
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect(('127.0.0.1',6003))
 	dados1=ts(arq)
-	print(dados1)
+	#print(dados1)
 	s.close ()
 
+	#Recebendo arquivos disponivei no peer3
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect(('127.0.0.1',6004))
 	dados2 = ts(arq)
-	print(dados2)
+	#print(dados2)
 	s.close ()
 
+	#Recebendo arquivos disponivei no peer4
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect(('127.0.0.1',6005))
 	dados3 = ts(arq)
-	print(dados3)
+	#print(dados3)
 	s.close ()
 
+
+	#Verificando quais peers tem o arquivo
 	qtd = 0;
 	hash_tam = []
 	lista = []*1
@@ -84,6 +90,7 @@ while 1:
 				hash_tam.append(dados3[3])
 				break;
 
+	#Divindo tamanho do arquivo em blocos
 	if qtd!=0:
 		if qtd == 1:
 			tamanho = int(hash_tam[0])
@@ -91,6 +98,7 @@ while 1:
 			lista.append(str(tamanho))
 			lista.append(hash_adc[0])
 			lista.append(arq)
+			print('\n')
 			print(lista)
 		if qtd == 2:
 			tamanho = int(hash_tam[0])
@@ -109,6 +117,7 @@ while 1:
 			lista.append(str(tam2))
 			lista.append(hash_adc[0])
 			lista.append(arq)
+			print('\n')
 			print(lista)
 		if qtd == 3:
 			tamanho = int(hash_tam[0])
@@ -134,27 +143,24 @@ while 1:
 			lista.append(str(tam3))
 			lista.append(hash_adc[0])
 			lista.append(arq)
+			print('\n')
 			print(lista)
 		
-
+	#Salvando os dados no terrent para mandar para o peer1
 	arquivo = open('torrent.txt', 'w')
 	for i in lista:
 		arquivo.write(i+' ')
 	arquivo.close()
 
+	#Realizando conexão com o cliente
 	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
- 
-	print("Conectando com scliente...")
+	#print("Conectando com scliente...")
 	s.connect((host,6002))
-	 
-	print("Abrindo arquivo torrent...")
+	#print("Abrindo arquivo torrent...")
 	arq=open('torrent.txt','rb')
-	 
-	print("Enviando arquivo...")
-
+	print("\nEnviando .torrent...")
 	for i in arq:
 		s.send(i)
-
 	print("Enviado com sucesso...")
 	arq.close()
 	s.close()

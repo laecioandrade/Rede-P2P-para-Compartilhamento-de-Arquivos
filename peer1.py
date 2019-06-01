@@ -26,7 +26,7 @@ def hashFor(data):
 HOST = "127.0.0.1"
 PORT = 6001
 while True:
-	x = input("\n\n1-Procurar arquivo\n2-Baixar PDF\n3-Sair\n")
+	x = input("\n1-Procurar arquivo\n2-Baixar PDF\n3-Sair\n")
 	if x == '1':
 		#Enviando nome do arquivo para tracker
 		y = input("\n\nQual o nome do arquivo?\n")
@@ -39,11 +39,11 @@ while True:
 		arq = open('torrent/torrent.txt','wb')
 		#Recebendo arquivo com os dados
 		s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		print("Escutando a porta...")
+		#print("Escutando a porta...")
 		s.bind((HOST,6002))
 		s.listen(2)
 	 
-		print("Aceitando a conexao...")
+		#print("Aceitando a conexao...")
 		conn,addr= s.accept()
 		res = [] 
 		#Escrevendo arquivo em um arquivo local
@@ -64,11 +64,11 @@ while True:
 		for linha in texto :
 		    res = linha
 		arq.close()
-		print(res)
+		#print(res)
 		#Criando lista de dados
 		if res != []:
 			res = res.split()
-			print(res)
+			#print(res)
 
 			#Preparando dados da lista
 			tam_blocks = []
@@ -86,29 +86,29 @@ while True:
 			nome_arq=res[fim2+1]
 			
 			#Mostrando dados
-			print(cod_hash)
-			print(nome_arq)
-			print(tam_blocks)
-			print(hosts)
-			print(ports)
+			#print(cod_hash)
+			#print(nome_arq)
+			#print(tam_blocks)
+			#print(hosts)
+			#print(ports)
 
 			tamanho=0
 			for i in range(len(hosts)):
 				tamanho+=int(tam_blocks[i])
 			tamanho = str(tamanho)
 			
-			print('\n\n')
+			print('\n')
 			print('Tamanho dos blocos')
 			print(tam_blocks)
 			print('Tamanho')
 			print(tamanho)
-			print('\n\n')
+			print('\n')
 		else:
 			print('Nenhum peer tem o arquivo!')
 
 
 
-		print(".torrent foi um sucesso!")
+		#print(".torrent foi um sucesso!")
 
 	elif x == '2':
 		print('Porta de envio')
