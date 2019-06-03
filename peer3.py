@@ -17,16 +17,17 @@ def hashFor(data):
 
 #Conexão com Tracker
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = "127.0.0.1"
+#IP local
+host = "192.168.0.102"
 port = 6004
 print(host)
 print(port)
-serversocket.bind((host, port))
+serversocket.bind(('', port))
 serversocket.listen(5)
 print('Iniciando a escuta!')
 #Conexão com o peer1
 s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((host,7004))
+s.bind(('',7004))
 s.listen(5)
 while 1:
     (clientsocket, address) = serversocket.accept()
@@ -92,7 +93,7 @@ while 1:
                 tam_fim  = int(arq2[1])
                 time.sleep(2)
             else:
-                tam_env = tam - int(arq2[1])
+                tam_env = int(arq2[4])-int(arq2[1])
                 tam_fim = int(arq2[4])+1
                 time.sleep(4)
         if int(arq2[5]) == 3:
@@ -112,7 +113,8 @@ while 1:
         #Criando conexão para envio de parte do arquivo
         sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         #print("Conectando com cliente...")
-        sock.connect((arq2[3],int(arq2[2])))
+        #IP do cliente        
+        sock.connect((str(arq2[3]),int(arq2[2])))
         #print("Abrindo arquivo...")
         arq_aux=open(end+'/'+arq2[0],'r+b')
         print("\nEnviando arquivo...")

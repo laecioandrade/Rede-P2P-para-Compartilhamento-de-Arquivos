@@ -23,15 +23,16 @@ def hashFor(data):
 
     return hashId.hexdigest()
 
-HOST = "127.0.0.1"
+HOST = "192.168.0.111"
 PORT = 6001
 while True:
-	x = input("\n1-Procurar arquivo\n2-Baixar PDF\n3-Sair\n")
+	x = input("\n1-Procurar arquivo\n3-Sair\n")
 	if x == '1':
 		#Enviando nome do arquivo para tracker
 		y = input("\n\nQual o nome do arquivo?\n")
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((HOST,PORT))
+		#IP do traker		
+		s.connect(('192.168.0.102',PORT))
 		ts(y)
 		s.close ()
 
@@ -40,7 +41,7 @@ while True:
 		#Recebendo arquivo com os dados
 		s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		#print("Escutando a porta...")
-		s.bind((HOST,6002))
+		s.bind(('',6002))
 		s.listen(2)
 	 
 		#print("Aceitando a conexao...")
@@ -110,7 +111,7 @@ while True:
 
 		#print(".torrent foi um sucesso!")
 
-	elif x == '2':
+	#elif x == '2':
 		print('Porta de envio')
 		porta_env = '6009'
 		print('Vamos baixar seu aquivo jaja...')
@@ -642,15 +643,17 @@ while True:
 				print("3,2,1")
 
 		print("Recebendo o arquivo...")
-		saida_a = open('Download/saida.pdf','wb')
+		saida_a = open('Download/'+y,'wb')
 
 		i=0
+
+		s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#print("...")
+		s.bind(('',int(porta_env)))
+		s.listen(2)
 		print(len(hosts))
 		while i < len(hosts):
-			s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			print("...")
-			s.bind(('127.0.0.1',int(porta_env)))
-			s.listen(2)
+			
 		 
 			print("...")
 			conn,addr= s.accept()
@@ -662,16 +665,18 @@ while True:
 				saida_a.write(dados)    
 			 
 			print("...")
-			conn.close()
+			
 			i+=1
 		saida_a.close()
+		conn.close()
+		s.close()
 		print("Arquivo baixado...")
 
 
 		#aux_arq_hash =  open('Download/saida.pdf','rb')
 		#result  = hashFor(aux_arq_hash)
 		#aux_arq_hash.close()
-		result  = hashlib.md5(file_as_bytes(open('Download/saida.pdf', 'rb'))).hexdigest()
+		result  = hashlib.md5(file_as_bytes(open('Download/'+y, 'rb'))).hexdigest()
 		print(cod_hash)
 		print(result)
 		if result == cod_hash:

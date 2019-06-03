@@ -14,7 +14,8 @@ def ts(str):
 
 #Cenexão com peer1
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = '127.0.0.1'
+#IP local
+host = '192.168.0.102'
 port = 6001
 print(host)
 print(port)
@@ -34,21 +35,24 @@ while 1:
 
 	#Recebendo arquivos disponivei no peer2
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect(('127.0.0.1',6003))
+	#IP peer2	
+	s.connect(('192.168.0.102',6003))
 	dados1=ts(arq)
 	#print(dados1)
 	s.close ()
 
 	#Recebendo arquivos disponivei no peer3
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect(('127.0.0.1',6004))
+	#IP peer3	
+	s.connect(('192.168.0.102',6004))
 	dados2 = ts(arq)
 	#print(dados2)
 	s.close ()
 
 	#Recebendo arquivos disponivei no peer4
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect(('127.0.0.1',6005))
+	#IP peer4	
+	s.connect(('192.168.0.102',6005))
 	dados3 = ts(arq)
 	#print(dados3)
 	s.close ()
@@ -155,7 +159,8 @@ while 1:
 	#Realizando conexão com o cliente
 	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 	#print("Conectando com scliente...")
-	s.connect((host,6002))
+	#IP cliente	
+	s.connect(('192.168.0.111',6002))
 	#print("Abrindo arquivo torrent...")
 	arq=open('torrent.txt','rb')
 	print("\nEnviando .torrent...")
