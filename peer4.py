@@ -84,12 +84,12 @@ while 1:
         
         #Verificando quando sua ordem e tamanho do bloco correspondente
         if int(arq2[5]) == 1:
-            tam_env = 0
+            tam_env = 1
             tam_fim = int(arq2[4])+1
             time.sleep(2)
         if int(arq2[5]) == 2:
             if int(arq2[6]) == 0:
-                tam_env = 0
+                tam_env = 1
                 tam_fim  = int(arq2[1])
                 time.sleep(2)
             else:

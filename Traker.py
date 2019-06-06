@@ -33,29 +33,38 @@ while 1:
 	r = 'Tratando dados...'
 	clientsocket.send(r.encode())
 
-	#Recebendo arquivos disponivei no peer2
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	#IP peer2	
-	s.connect(('192.168.0.102',6003))
-	dados1=ts(arq)
-	#print(dados1)
-	s.close ()
+	try:
+		#Recebendo arquivos disponivei no peer2
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#IP peer2	
+		s.connect(('192.168.0.102',6003))
+		dados1=ts(arq)
+		#print(dados1)
+		s.close ()
+	except:
+		dados1 = 'Erro'
 
-	#Recebendo arquivos disponivei no peer3
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	#IP peer3	
-	s.connect(('192.168.0.102',6004))
-	dados2 = ts(arq)
-	#print(dados2)
-	s.close ()
+	try:	
+		#Recebendo arquivos disponivei no peer3
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#IP peer3	
+		s.connect(('192.168.0.102',6004))
+		dados2 = ts(arq)
+		#print(dados2)
+		s.close ()
+	except:
+		dados2 = 'Erro'
 
-	#Recebendo arquivos disponivei no peer4
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	#IP peer4	
-	s.connect(('192.168.0.102',6005))
-	dados3 = ts(arq)
-	#print(dados3)
-	s.close ()
+	try:	
+		#Recebendo arquivos disponivei no peer4
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#IP peer4	
+		s.connect(('192.168.0.102',6005))
+		dados3 = ts(arq)
+		#print(dados3)
+		s.close ()
+	except:
+		dados3 = 'Erro'
 
 
 	#Verificando quais peers tem o arquivo
